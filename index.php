@@ -2,7 +2,6 @@
 ini_set("user_agent",$_SERVER['HTTP_USER_AGENT']);
 session_start();
 error_reporting(E_ALL & ~E_NOTICE);
-
 $_SESSION["urlList"] = $_POST['urlList'];
 $_SESSION["url"] = $_POST['url'];
 $_SESSION["title"] = $_POST['title'];
@@ -21,12 +20,12 @@ $_SESSION["customClassText"] = $_POST['customClassText'];
 
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/php/SimpleDomHTMLParser/simple_html_dom.php');
-require_once($_SERVER['DOCUMENT_ROOT'].'/php/parce.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/php/parse.php');
 ?>
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="/css/style.css" >
     <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" >
+    <link rel="stylesheet" href="/css/style.css" >
     <script defer src="bootstrap/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
