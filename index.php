@@ -1,7 +1,8 @@
 <?php
-ini_set("user_agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0");
+ini_set("user_agent",$_SERVER['HTTP_USER_AGENT']);
 session_start();
 error_reporting(E_ALL & ~E_NOTICE);
+
 $_SESSION["urlList"] = $_POST['urlList'];
 $_SESSION["url"] = $_POST['url'];
 $_SESSION["title"] = $_POST['title'];
@@ -18,33 +19,15 @@ $_SESSION["customText"] = $_POST['customText'];
 $_SESSION["customClass"] = $_POST['customClass'];
 $_SESSION["customClassText"] = $_POST['customClassText'];
 
-    include('simple_html_dom.php');?>
+
+require_once($_SERVER['DOCUMENT_ROOT'].'/php/SimpleDomHTMLParser/simple_html_dom.php');
+require_once($_SERVER['DOCUMENT_ROOT'].'/php/parce.php');
+?>
 <head>
     <meta charset="UTF-8">
-    <style>
-        body{
-            width: 99% !important;
-            margin: 0 auto !important;
-        }
-        .properties{
-        display:flex;
-        gap:20px;
-        flex-wrap:wrap;
-        margin: 10px;
-        }
-        .url_area{
-            width: 100%;
-            height: 250px !important;
-        }
-        thead{
-            position: sticky;
-            top: 0;
-            background: white;
-        }
-    </style>
-
-    <link rel="stylesheet" href="css/bootstrap.min.css" >
-    <script defer src="js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="/css/style.css" >
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" >
+    <script defer src="bootstrap/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
     <container class="container-fluid">
@@ -109,108 +92,21 @@ $_SESSION["customClassText"] = $_POST['customClassText'];
     <br><br>
 <?php
 
-$defTag= [
-    "title" => "title,Title",
-    "description" => 'meta[name=description],meta[name=Description]',
-    "keywords" =>  "meta[name=keywords], meta[name=Keywords]",
-    "h1" => "h1,H1",
-    "h2" => "h3,H2",
-    "h3" => "h3,H3",
-    "h4" => "h4,H4",
-    "h5" => "h5,H5",
-    "h6" => "h6,H6",
-];
-
-$recArray=[];
-
-function parseData ($urlList ,$tagArray){
-    $links = explode ("\n" ,$urlList);
-    $resArray=[];
-    $i = 0;
-    foreach ($links as $link) {
-        $headers = get_headers(trim($link));
-        if (empty($headers[0])) {
-            $code = 'noResponse';
-        } else {
-            $code = substr($headers[0], 9, 3);
-        }
-/*        echo "<pre>";
-        print_r($links);
-
-        echo '<br>'.$link.'<br>';
-        print_r($headers);
-        echo "</pre>";*/
-        if (filter_var(trim($link), FILTER_VALIDATE_URL) && $code != '404' && $code != 'noResponse'){
-            $html = new simple_html_dom();
-            $html->load_file(trim($link)); 
-            $j = 0;
-            foreach($tagArray as $tag){
-                if ($tag == 'true'){
-                    $resArray[$i][(array_keys($tagArray)[$j])] = '<b>Code:'. $code.'</b> '.$link;
-                }else{
-                    $parseResult  = $html->find($tag);
-                    $z=0;
-                    $resArray[$i][(array_keys($tagArray)[$j])][0]='';
-                    foreach ($parseResult as $dataElement) {
-                        $resArray[$i][(array_keys($tagArray)[$j])][$z] = strip_tags($dataElement->innertext).strip_tags($dataElement->content).strip_tags($dataElement->href)."";
-                        $z++;
-                    }
-                }
-                $j++;
-            }
-        }else{
-            $j = 0;
-            foreach($tagArray as $tag){
-                if ($tag == 'true'){
-                    $resArray[$i][(array_keys($tagArray)[$j])] = '<b>Code:'. $code.'</b> '.$link;
-                }else{
-                    $z=0;
-                    $resArray[$i][(array_keys($tagArray)[$j])][0]='code: '.$code.' ОШИБКА! Проверьте URL!';
-                }
-                $j++;
-            }   
-        
-        }
-        $i++;
-    }
-    generateTable($resArray ,$tagArray);
-}
-
-function generateTable($resArray ,$tagArray){
-        
-    function generateTableHead($tagArray){
-        echo '<thead><tr>';
-        foreach (array_keys($tagArray) as $tag){
-            echo "<th>$tag</th>";
-        }
-        echo '</tr></thead>';
-    }
-
-    function generateTableBody($resArray){
-        foreach($resArray as $res){
-            echo '<tr>';
-
-                foreach($res as $cell){
-                    echo '<td>';
-                    if (is_array($cell)){
-                        foreach ($cell as $dataElement) {
-                            echo $dataElement. "<br>\r\n";
-                        }
-                    }else{
-                        echo $cell. "<br>\r\n";
-                    }
-                    echo '</td>';
-                }
-            echo '</tr>';
-        }
-    }
-    echo '<table class="table table-striped">';
-    generateTableHead($tagArray);
-    generateTableBody($resArray);
-    echo '</table>';
-}
-
 if (isset($_POST['urlList'])) {
+
+    $defTag= [
+        "title" => "title,Title",
+        "description" => 'meta[name=description],meta[name=Description]',
+        "keywords" =>  "meta[name=keywords], meta[name=Keywords]",
+        "h1" => "h1,H1",
+        "h2" => "h3,H2",
+        "h3" => "h3,H3",
+        "h4" => "h4,H4",
+        "h5" => "h5,H5",
+        "h6" => "h6,H6",
+    ];
+
+    $recArray=[];
     
     if ($_POST['url'] == 'on') {
         $recArray["url"] = "true";
@@ -252,8 +148,8 @@ if (isset($_POST['urlList'])) {
     parseData($_POST['urlList'], $recArray);
  
 } else {
-print 'Нет ссылочек. Как так то?';
-session_destroy();
+    print 'Нет ссылочек. Как так то?';
+    session_destroy();
 }
 ?>
     </container>
