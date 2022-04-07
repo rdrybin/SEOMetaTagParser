@@ -4,6 +4,7 @@ session_start();
 error_reporting(E_ALL & ~E_NOTICE);
 $_SESSION["urlList"] = $_POST['urlList'];
 $_SESSION["url"] = $_POST['url'];
+$_SESSION["rCode"] = $_POST['rCode'];
 $_SESSION["title"] = $_POST['title'];
 $_SESSION["description"] = $_POST['description'];
 $_SESSION["keywords"] = $_POST['keywords'];
@@ -37,7 +38,11 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/php/parse.php');
             <div>
                 <input class="form-check-input" type="checkbox" id="url" <?php if($_SESSION["url"]=='on') echo 'checked';?> name="url">
                 <label for="url">url</label>
-            </div>    
+            </div>
+            <div>
+                <input class="form-check-input" type="checkbox" id="rCode" <?php if($_SESSION["rCode"]=='on') echo 'checked';?> name="rCode">
+                <label for="rCode">Code & redirect</label>
+            </div>  
             <div>
                 <input class="form-check-input" type="checkbox" id="title" <?php if($_SESSION["title"]=='on') echo 'checked';?> name="title">
                 <label for="title">title</label>
@@ -50,7 +55,6 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/php/parse.php');
                 <input class="form-check-input" type="checkbox" id="keywords" <?php if($_SESSION["keywords"]=='on') echo 'checked';?> name="keywords">
                 <label for="keywords">keywords</label>
             </div>
-
             <div>
                 <input class="form-check-input" type="checkbox" id="h1" <?php if($_SESSION["h1"]=='on') echo 'checked';?> name="h1">
                 <label for="h1">h1</label>
@@ -108,41 +112,49 @@ if (isset($_POST['urlList'])) {
     $recArray=[];
     
     if ($_POST['url'] == 'on') {
-        $recArray["url"] = "true";
+        $recArray['link']["url"] = "true";
+    }
+    if ($_POST['rCode'] == 'on') {
+        $recArray["link"]['rCode'] = "true";
     }
     if ($_POST['title'] == 'on') {
-        $recArray["title"] = $defTag['title'];
+        $recArray["tags"]["title"] = $defTag['title'];
     }
     if ($_POST['description'] == 'on') {
-        $recArray["description"] = $defTag['description'];
+        $recArray["tags"]["description"] = $defTag['description'];
     }
     if ($_POST['keywords'] == 'on') {
-        $recArray["keywords"] = $defTag['keywords'];
+        $recArray["tags"]["keywords"] = $defTag['keywords'];
     }
     if ($_POST['h1'] == 'on') {
-        $recArray["h1"] = $defTag['h1'];
+        $recArray["tags"]["h1"] = $defTag['h1'];
     }
     if ($_POST['h2'] == 'on') {
-        $recArray["h2"] = $defTag['h2'];
+        $recArray["tags"]["h2"] = $defTag['h2'];
     }
     if ($_POST['h3'] == 'on') {
-        $recArray["h3"] = $defTag['h3'];
+        $recArray["tags"]["h3"] = $defTag['h3'];
     }
-    if ($_POST['h4'] == 'on') {
-        $recArray["h4"] = $defTag['h4'];
+    if ($_POST["tags"]['h4'] == 'on') {
+        $recArray["tags"]["h4"] = $defTag['h4'];
     }
     if ($_POST['h5'] == 'on') {
-        $recArray["h5"] = $defTag['h5'];
+        $recArray["tags"]["h5"] = $defTag['h5'];
     }
     if ($_POST['h6'] == 'on') {
-        $recArray["h6"] = $defTag['h6'];
+        $recArray["tags"]["h6"] = $defTag['h6'];
     }
     if ($_POST['custom'] == 'on') {
-        $recArray["custom"] = $_POST['customText'];
+        $recArray["tags"]["custom"] = $_POST['customText'];
     }
     if ($_POST['customClass'] == 'on') {
-        $recArray["customClass"] = $_POST['customClassText'];
+        $recArray["tags"]["customClass"] = $_POST['customClassText'];
     }
+
+    echo "<pre>";
+    print_r($recArray);
+    echo "</pre>";
+
 
     parseData($_POST['urlList'], $recArray);
  
